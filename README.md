@@ -85,20 +85,16 @@ En este caso el modelo aprendió muy rápido. Si nos fijamos en los logs, su mej
 ### 4.4. Trabajo de extensión
 ## 5. Resultados experimentales y evaluación
 
-### 5.1 Comparativa de rendimiento entre representaciones textuales
+```txt
 +-------------------+-------------------+--------+--------+-------+
-
 | Representación    | Modelo            | MAE    | MSE    | R²    |
-
 +-------------------+-------------------+--------+--------+-------+
-
 | TF-IDF            | Ridge             | 1.248  | 2.198  | 0.077 |
-
 | Word2Vec          | Ridge (ensemble)  | 1.256  | 2.220  | 0.067 |
-
 | BERT (MiniLM)     | Ridge             | 1.257  | 2.201  | 0.075 |
-
 +-------------------+-------------------+--------+--------+-------+
+```
+
 
 
 Los resultados obtenidos muestran diferencias muy reducidas entre los tres enfoques evaluados . Aun así, atendiendo estrictamente a las métricas, el modelo basado en TF-IDF + Ridge es el que alcanza el mejor desempeño global. Tiene el MAE y MSE más bajo y el R² más alto.
