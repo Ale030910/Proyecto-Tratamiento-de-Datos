@@ -115,6 +115,14 @@ Sin fine-tuning, los embeddings BERT siguen siendo genéricos. Esto limita signi
 
 ## 6. Conclusión
 
+El presente trabajo demuestra que la relación entre desinformación y polarización ideológica puede estudiarse de forma efectiva siempre que incluyan metadatos políticos y un historial verificable de la credibilidad de los emisores. El dataset LIAR, pese a sus limitaciones, permite observar patrones consistentes entre identidad política, producción de afirmaciones inexactas y distribución de contenidos potencialmente polarizantes.
+
+Desde el punto de vista metodológico, la comparación entre múltiples representaciones vectoriales y modelos predictivos ofrece un resultado claro. Los modelos lineales simples, combinados con representaciones basadas en frecuencia (TF-IDF), superan a las redes neuronales clásicas y a los modelos basados en embeddings estáticos. Esto se debe a que las afirmaciones del dataset son breves y directas, lo que hace que las palabras clave sean especialmente importantes y que la semántica más profunda aporte menos información de lo esperado.
+
+Las redes neuronales entrenadas sobre TF-IDF o embeddings densos de Word2Vec y BERT no lograron mejorar la línea base lineal. Esto confirma que los modelos no lineales requieren información contextual y que no se puede explotar adecuadamente si los embeddings permanecen fijos. Esta limitación se resolvió al aplicar fine-tuning sobre un Transformer, cuyo rendimiento, aunque aún modesto (R²≈0.10), fue el más alto de todo el estudio. Esto demuestra que los matices lingüísticos asociados a la veracidad política sólo pueden capturarse cuando un modelo contextual puede ajustar sus capas internas al dominio específico.
+En conjunto, los resultados permiten extraer tres conclusiones principales. Primero, la desinformación presente en el dataset muestra patrones claramente asociados a la identidad política, coherentes con las dinámicas de polarización que suelen observarse en redes sociales. Segundo, la forma de representar el texto resulta más decisiva que la complejidad del modelo: enfoques sencillos pueden superar a métodos avanzados cuando los embeddings no están adaptados a la tarea.
+Además, el fine-tuning de modelos Transformer se revela como un paso clave para capturar los matices semánticos necesarios en un problema donde las diferencias entre categorías son sutiles y difíciles de predecir.
+Aunque el rendimiento predictivo global sigue siendo limitado —lo cual refleja la dificultad inherente de evaluar la veracidad solo a partir del texto—, los resultados muestran que los modelos de aprendizaje profundo ajustados específicamente para este dominio constituyen la vía más prometedora para analizar la desinformación y su papel en la polarización ideológica.
 
 
 
