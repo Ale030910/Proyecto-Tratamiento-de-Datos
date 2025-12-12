@@ -83,6 +83,11 @@ En conjunto, esta fase permitió comparar de manera homogénea la capacidad pred
 Como esperábamos, el modelo de BERT con Fine-Tuning ha conseguido el mejor resultado de todos. Se nota claramente la mejora respecto a los modelos anteriores (donde el Ridge se quedó en 0.07 y la red neuronal en 0.04, y esto tiene sentido: en los pasos anteriores usábamos BERT como una 'caja fija' que solo nos daba números, pero aquí hemos reentrenado sus capas para que aprendan específicamente a detectar matices de veracidad en el lenguaje político.
 En este caso el modelo aprendió muy rápido. Si nos fijamos en los logs, su mejor momento fue en la Época 2 (donde llegó a tener métricas de validación incluso mejores), y en la tercera ya empezaba a 'memorizar' demasiado (overfitting), por lo que el Early Stopping y la carga del mejor modelo fueron claves. En conclusión, aunque un R^2 de 0.10 sigue pareciendo bajo (lo que nos confirma que el dataset LIAR es muy difícil de predecir solo con texto), queda demostrado que ajustar un Transformer es mucho más efectivo que usar redes neuronales clásicas o modelos lineales.
 ### 4.4. Trabajo de extensión
+
+En el proyecto de extensión, realizamos un análisis correlacional de la polarización. En lugar de predecir la veracidad, estudiamos los factores externos e internos que la rodean:
+· Factor externo (fuente): analizamos el ratio de falsedad por partido político, descubriendo que ciertos grupos ideológicos presentan una tendencia significativamente mayor a emitir declaraciones de baja credibilidad, lo que confirma el sesgo partidista en la desinformación.
+Este estudio demuestra que la desinformación no es solo un problema de hechos incorrectos, sino un fenómeno complejo ligado a la identidad política y a la manipulación emocional.
+
 ## 5. Resultados experimentales y evaluación
 
 ```txt
@@ -107,6 +112,9 @@ Con textos tan reducidos, los modelos basados en contexto (Word2Vec o BERT) tien
 En LIAR, ciertos términos o construcciones léxicas son indicativos del tipo de afirmación. TF-IDF, al basarse en frecuencia, identifica estos patrones de manera más explícita que Word2Vec o BERT.
 3. Los modelos contextuales no se han afinado (no hubo fine-tuning).
 Sin fine-tuning, los embeddings BERT siguen siendo genéricos. Esto limita significativamente su capacidad para capturar los matices políticos del dataset, y favorece a enfoques más simples como TF-IDF.
+
+## 6. Conclusión
+
 
 
 
