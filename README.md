@@ -64,4 +64,46 @@ CONCLUSIÓN REDES NEURONALES: las redes neuronales alimenatadas con datos fijos 
 Para establecer una línea base en la predicción del nivel de desinformación, se entrenaron modelos clásicos de Scikit-learn utilizando las distintas representaciones vectoriales del texto. El objetivo es analizar cómo se comportan técnicas tradicionales de regresión cuando se alimentan con los tres tipos de embeddings explicados anteriormente. 
 Para preparar los datos el conjunto se dividió en entrenamiento y test, manteniendo la distribución original de la variable objetivo. 
 
+#### 4.2.1 Modelado con TF-IDF + Ridge
+
+En primer lugar, se empleó una regresión Ridge sobre la representación TF-IDF. Este modelo resulta adecuado para espacios de elevada dimensionalidad, como los generados por los n-gramas utilizados en el proyecto. El vectorizador se configuró para incluir unigramas, bigramas y trigramas, con un vocabulario máximo de 15 000 términos y umbrales de frecuencia que permiten descartar palabras excesivamente comunes o demasiado infrecuentes. Además, se aplicó una transformación sublineal del término frecuencia con el fin de estabilizar los pesos y evitar que documentos muy largos dominasen el entrenamiento.
+
+Tras vectorizar los textos, el conjunto de entrenamiento se dividió de nuevo para seleccionar el valor óptimo del hiperparámetro α mediante validación. Una vez determinado, se ajustó el modelo final y se evaluó su rendimiento en el conjunto de test empleando las métricas MAE, MSE y R².
+
+#### 4.2.2 Modelado con Word2Vec (ensemble) + Ridge
+El segundo enfoque consiste en utilizar representaciones distribuidas mediante Word2Vec. Para ello se aplicó previamente una tokenización personalizada que preserva números, elimina caracteres irrelevantes y filtra stopwords, con el objetivo de generar un conjunto de textos preprocesados limpio y coherente para el entrenamiento.
+A partir de esta base, se entrenaron tres modelos Word2Vec diferentes: un modelo CBOW y dos variantes Skip-Gram con distintos tamaños de embedding. Cada configuración capturaba relaciones semánticas parcialmente distintas, por lo que se decidió combinarlas en un pequeño ensemble.
+Como Word2Vec genera embeddings a nivel de palabra, la representación de cada documento se obtuvo mediante un promedio ponderado. Los pesos procedían de un modelo TF-IDF independiente, lo que permitió dar mayor relevancia a los términos informativamente significativos. Posteriormente, los vectores documentales se estandarizaron y se ajustó una regresión Ridge para cada uno de los tres modelos. Las predicciones finales se obtuvieron promediando las tres salidas, lo que redujo la varianza y proporcionó un comportamiento más estable.
+#### 4.2.3 Modelado con embeddings BERT + Ridge
+Finalmente, se evaluó la representación basada en embeddings contextuales mediante un modelo Transformer preentrenado (all-MiniLM-L12-v2). Este enfoque proporciona vectores densos cuyo significado depende del contexto completo, lo que permite capturar matices lingüísticos más profundos que los disponibles en las representaciones anteriores.
+Una vez generados los embeddings, estos se normalizaron mediante un escalado estándar, ya que los modelos lineales suelen comportarse mejor cuando trabajan con vectores centrados. El ajuste del modelo se realizó mediante RidgeCV, que selecciona automáticamente el mejor valor de α dentro de un rango logarítmico.
+#### 4.2.4 Evaluación conjunta
+En conjunto, esta fase permitió comparar de manera homogénea la capacidad predictiva de un mismo modelo lineal cuando se utilizan representaciones textuales de naturaleza muy distinta. El uso consistente de las métricas MAE, MSE y R² facilitó analizar las diferencias entre enfoques basados en frecuencia, modelos distribuidos clásicos y embeddings contextuales de última generación.
+### 4.3. Fine-tuning de Transformer (Hugging Face)
+Como esperábamos, el modelo de BERT con Fine-Tuning ha conseguido el mejor resultado de todos. Se nota claramente la mejora respecto a los modelos anteriores (donde el Ridge se quedó en 0.07 y la red neuronal en 0.04, y esto tiene sentido: en los pasos anteriores usábamos BERT como una 'caja fija' que solo nos daba números, pero aquí hemos reentrenado sus capas para que aprendan específicamente a detectar matices de veracidad en el lenguaje político.
+En este caso el modelo aprendió muy rápido. Si nos fijamos en los logs, su mejor momento fue en la Época 2 (donde llegó a tener métricas de validación incluso mejores), y en la tercera ya empezaba a 'memorizar' demasiado (overfitting), por lo que el Early Stopping y la carga del mejor modelo fueron claves. En conclusión, aunque un R^2 de 0.10 sigue pareciendo bajo (lo que nos confirma que el dataset LIAR es muy difícil de predecir solo con texto), queda demostrado que ajustar un Transformer es mucho más efectivo que usar redes neuronales clásicas o modelos lineales.
+### 4.4. Trabajo de extensión
+## 5. Resultados experimentales y evaluación
+
+### 5.1 Comparativa de rendimiento entre representaciones textuales
++-------------------+-------------------+--------+--------+-------+
+| Representación    | Modelo            | MAE    | MSE    | R²    |
++-------------------+-------------------+--------+--------+-------+
+| TF-IDF            | Ridge             | 1.248  | 2.198  | 0.077 |
+| Word2Vec          | Ridge (ensemble)  | 1.256  | 2.220  | 0.067 |
+| BERT (MiniLM)     | Ridge             | 1.257  | 2.201  | 0.075 |
++-------------------+-------------------+--------+--------+-------+
+
+Los resultados obtenidos muestran diferencias muy reducidas entre los tres enfoques evaluados . Aun así, atendiendo estrictamente a las métricas, el modelo basado en TF-IDF + Ridge es el que alcanza el mejor desempeño global. Tiene el MAE y MSE más bajo y el R² más alto.
+
+El modelo basado en BERT queda muy próximo, seguido por Word2Vec, pero ninguno supera al enfoque TF-IDF en este escenario particular.
+Aunque los modelos basados en embeddings suelen sobresalir en tareas de comprensión semántica, en este proyecto se observan tres factores que explican el mejor desempeño de TF-IDF. 
+1. El dataset LIAR es relativamente corto y con afirmaciones breves.
+Con textos tan reducidos, los modelos basados en contexto (Word2Vec o BERT) tienen menos información para explotar, mientras que TF-IDF captura directamente las palabras clave que suelen asociarse a cada etiqueta de veracidad.
+2. La relación entre vocabulario y veracidad es muy directa.
+En LIAR, ciertos términos o construcciones léxicas son indicativos del tipo de afirmación. TF-IDF, al basarse en frecuencia, identifica estos patrones de manera más explícita que Word2Vec o BERT.
+3. Los modelos contextuales no se han afinado (no hubo fine-tuning).
+Sin fine-tuning, los embeddings BERT siguen siendo genéricos. Esto limita significativamente su capacidad para capturar los matices políticos del dataset, y favorece a enfoques más simples como TF-IDF.
+
+
 
