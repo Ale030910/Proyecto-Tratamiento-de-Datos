@@ -94,6 +94,7 @@ En este caso el modelo aprendió muy rápido. Si nos fijamos en los logs, su mej
 | BERT (MiniLM)     | Ridge             | 1.257  | 2.201  | 0.075 |
 +-------------------+-------------------+--------+--------+-------+
 
+
 Los resultados obtenidos muestran diferencias muy reducidas entre los tres enfoques evaluados . Aun así, atendiendo estrictamente a las métricas, el modelo basado en TF-IDF + Ridge es el que alcanza el mejor desempeño global. Tiene el MAE y MSE más bajo y el R² más alto.
 
 El modelo basado en BERT queda muy próximo, seguido por Word2Vec, pero ninguno supera al enfoque TF-IDF en este escenario particular.
